@@ -1,0 +1,16 @@
+Sub Main 
+ TakeArm Keep = 1
+
+  '3 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,30,0,0,0)
+  Move P, @P J(90,40,-20,0,0,0)
+  Move P, @P J(-20,90,-60,0,0,0)
+  Move P, @P J(-15,-30,10,0,0,0)
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+
+
+
+End Sub

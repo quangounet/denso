@@ -1,0 +1,57 @@
+Sub Main 
+ TakeArm Keep = 1
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(90,30,0,0,0,0)
+  Delay 1000
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(90,40,0,0,0,0)
+  Delay 1000
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(90,50,0,0,0,0)
+  Delay 1000
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(90,60,0,0,0,0)
+  Delay 1000
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(90,70,0,0,0,0)
+  Delay 1000
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(90,80,0,0,0,0)
+  Delay 1000
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(90,90,0,0,0,0)
+  Delay 1000
+
+
+  Move P, @E J(0,0,0,0,0,0)
+
+
+End Sub

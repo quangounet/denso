@@ -1,0 +1,92 @@
+Sub Main 
+ TakeArm Keep = 1
+
+  '1 DOF interp close
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(5,0,0,0,0,0)
+  Move P, @E J(8,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp close 2
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(3,0,0,0,0,0)
+  Move P, @E J(8,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp far
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,0,0,0,0,0)
+  Move P, @E J(140,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp far 2
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(60,0,0,0,0,0)
+  Move P, @E J(140,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp close-far
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(5,0,0,0,0,0)
+  Move P, @E J(90,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp far-close
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(85,0,0,0,0,0)
+  Move P, @E J(90,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp trace back close
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(5,0,0,0,0,0)
+  Move P, @E J(2,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp trace back far-far
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,0,0,0,0,0)
+  Move P, @E J(10,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp trace back far-close
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,0,0,0,0,0)
+  Move P, @E J(75,0,0,0,0,0)
+  Delay 1000
+
+  '1 DOF interp trace back close-far
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(5,0,0,0,0,0)
+  Move P, @E J(-75,0,0,0,0,0)
+  Delay 1000
+
+
+  '2 DOF interp same sat joint
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(140,45,0,0,0,0)
+  Delay 1000
+
+  '2 DOF interp different sat joint 
+  Move P, @E J(0,0,0,0,0,0)
+  Delay 1000
+  Move P, @P J(80,20,0,0,0,0)
+  Move P, @E J(95,90,0,0,0,0)
+  Delay 1000
+
+  Move P, @E J(0,0,0,0,0,0)
+
+
+End Sub

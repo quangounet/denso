@@ -1,0 +1,36 @@
+RC : Robot Controller
+TP : Teach Pendant
+PC : Personnal Computer (which is running Wincaps)
+
+
+Setting up the Ethernet connection :
+
+1) PC : plug in the Ethernet cable that connects to RC
+2) PC : in the Network Connections panel of Windows, select Local Area Connection -> Properties -> TCP/IP
+3) PC : set IP address to 192.168.0.2 and subnet mask 255.255.255.0 and exit
+
+
+Executing :
+
+1) RC : Switch on
+2) TP : Select Manual Mode (with the key)
+3) TP : From the starting screen select Settings -> Communication and Token -> Executable Token
+4) TP : Choose Ethernet and enter the IP address of the computer (normally 192.168.0.2), press OK
+5) TP : Select Auto Mode (with the key)
+6) PC : Connect -> Transfer data, and select the program to transfer
+7) PC : Connect -> Monitor Communication -> Online (Debug)
+8) TP : Disable Emergency Stop and make sure no one is in the operation area
+9) PC : Turn Motor on (big button below the main menu bar)
+10) PC : Set speed
+11) PC : Press Play (green triangle button)
+12) TP : Press Emergency Stop
+
+
+Logging :
+
+1) PC : View -> Log view -> Control
+2) PC : Select Log tab and press Play in the Log menu bar
+3) PC : Press Play in the Motor Communication menu bar to execute the program
+4) PC : After the program stops, Press Stop in the Log menu bar
+5) PC : Press Thunderbold to download the log from the RC
+*) PC : It is possible to set the recording time by Debug -> Controller settings -> Control log mode settings
