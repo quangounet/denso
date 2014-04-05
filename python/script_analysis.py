@@ -12,6 +12,7 @@ sampling = 0.008
 
 # Loading robot command and encoder data
 #cd "C:\Documents and Settings\RRC Staff\git\cri1\denso\python"
+#cd git/denso/python/
 datafile = "../data/constraintparabolicsmoothingopt.csv"
 data = loadtxt(datafile,delimiter=',',skiprows=5,converters={33: lambda x:0}) 
 j0command = data[:-3,1]*pi/180
