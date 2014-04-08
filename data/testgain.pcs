@@ -1,0 +1,8 @@
+Sub Main 
+ TakeArm Keep = 1
+  Move P, @E J(0.0,0.0,0.0,0.0,0.0,0.0)
+  Delay 1000
+  Move P, @P J(20.0,30.0,40.0,0.0,0.0,0.0), Speed=100, Accel=100
+  Move P, @P J(45.0,90.0,50.0,0.0,0.0,0.0), Speed=50.0, Accel=100
+  Move P, @E J(120.0,45.0,90.0,0.0,0.0,0.0), Speed=100, Accel=30.0
+End Sub
