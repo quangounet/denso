@@ -30,8 +30,8 @@ j2command = j2command[onset_command:-1]
 j2encoder = j2encoder[onset_encoder:-1]
 tvect = arange(0,100,0.008)
 
-plot_command = True
-plot_encoder = False
+plot_command = False
+plot_encoder = True
 
 # Plotting robot command and encoder data
 figure(0)
