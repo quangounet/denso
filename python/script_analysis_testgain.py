@@ -15,7 +15,7 @@ amax = array([ 19.73356519,  16.84469621,  20.70885517,  20.96646577,
 sampling = 0.008
 
 # Loading robot command and encoder data
-datafile = "../data/constraintparabolicsmoothingopt.csv"
+datafile = "../data/testgain.csv"
 data = loadtxt(datafile,delimiter=',',skiprows=5,converters={33: lambda x:0}) 
 j0command = data[:-3,1]*pi/180
 j0encoder = data[:-3,2]*pi/180
@@ -68,21 +68,14 @@ if plot_encoder:
     plot(tvect[range(len(j1encoder)-2)],diff(diff(j1encoder))/sampling/sampling,"g",linewidth = 2)
     plot(tvect[range(len(j2encoder)-2)],diff(diff(j2encoder))/sampling/sampling,"b",linewidth = 2)
 
-tstart = 5.673
-tend = 6.987
+tstart = 14
+tend = 16.03
 #tstart = 8.25
 #tend = 9.47
 
-# Reference trajectory (compare with encoder values)
-trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/constraintparabolicsmoothing.topptraj","r").read())
-trajref = trajref.ExtractDOFs([0,1,2])
-if plot_encoder:
-    denso.PlotKinematics(trajref.Retime((tend-tstart)/trajref.duration),None,dt=0.001,colorcycle=['r','g','b'],tstart=tstart)
-
 # Optimal trajectory computed by denso.FindOptTraj (compare with command values)
-trajopt = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/constraintparabolicsmoothingopt.topptraj","r").read())
-if plot_command:
-    denso.PlotKinematics(trajopt,None,dt=0.001,colorcycle=['r','g','b'],tstart=tstart-0.05)
+trajopt = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/testgain.topptraj","r").read())
+denso.PlotKinematics(trajopt,None,dt=0.001,colorcycle=['r','g','b'],tstart=tstart+0.05)
 
 
 # Set axis values
