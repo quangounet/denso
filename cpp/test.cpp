@@ -9,12 +9,8 @@ int main()
     uint32_t lhController;
     BCAP_HRESULT hr = BCAP_S_OK;
 
-    std::cout << "toto\n";
-
     /* Init and Start b-CAP */
     hr = bCap_Open(SERVER_IP_ADDRESS, SERVER_PORT_NUM, &iSockFD);
-
-    std::cout << "tata\n";
 
     /* Init socket */
     if FAILED(hr) return (hr);
@@ -22,24 +18,47 @@ int main()
     /* Start b-CAP service */
     hr = bCap_ServiceStart(iSockFD);
 
-    /* Get controller handle */
     hr = bCap_ControllerConnect(iSockFD, "b-CAP", "caoProv.DENSO.VRC", SERVER_IP_ADDRESS, "", &lhController);
-    uint32_t lhTask;
-    long lMode;
 
-    /* Get task handle */
-    hr = bCap_ControllerGetTask(iSockFD, lhController, "Pro1", "", &lhTask);
+    // uint32_t lhVar;
+    // float lResult[6];
 
-    /* Start task */
-    lMode = 2L;
-    bCap_TaskStart(iSockFD, lhTask, lMode, "");
+    // /* Get variable handle */
+    // hr = bCap_ControllerGetVariable(iSockFD, lhController, "J0", "", &lhVar);
 
-    /* Stop task */
-    lMode = 3L;
-    bCap_TaskStop(iSockFD, lhTask, lMode, "");
+    // lResult[0] = 90;
+    // lResult[3] = 90;
+    // bCap_VariablePutValue(iSockFD, lhVar, VT_ARRAY, 6, &lResult);
 
-    /* Release task handle */
-    bCap_TaskRelease(iSockFD, lhTask);
+    // /* Read variable */
+    // bCap_VariableGetValue(iSockFD, lhVar, &lResult);
+
+    // std::cout << "var 0: "<< lResult[0] << "\n";    
+    // std::cout << "var 1: "<< lResult[1] << "\n";    
+    // std::cout << "var 2: "<< lResult[2] << "\n";    
+    // std::cout << "var 3: "<< lResult[3] << "\n";    
+
+    // /* Release variable handle */
+    // bCap_VariableRelease(iSockFD, lhVar);
+
+    uint32_t lhRobot;
+    uint32_t lResult;
+    /* Get robot handle */
+    hr = bCap_ControllerGetRobot(iSockFD, lhController, "Arm", "", &lhRobot);
+    /* Get arm control authority */
+    hr = bCap_RobotExecute(iSockFD, lhRobot, "Takearm", "", &lResult);
+    /* Motor on */
+    hr = bCap_RobotExecute(iSockFD, lhRobot, "Motor", "1", &lResult);
+    /* Move to J0 */
+    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(90,0,0,0,0,0)", "Speed=100");
+    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(135,0,0,0,0,0)", "Speed=50");
+    /* Motor off */
+    hr = bCap_RobotExecute(iSockFD, lhRobot, "Motor", "0", &lResult);
+    /* Release arm control authority */
+    hr = bCap_RobotExecute(iSockFD, lhRobot, "Givearm", "", &lResult);
+    /* Release robot handle */
+    bCap_RobotRelease(iSockFD, lhRobot);
+    
 
     /* Release controller handle */
     bCap_ControllerDisconnect(iSockFD, lhController);
@@ -48,4 +67,7 @@ int main()
     bCap_ServiceStop(iSockFD);
     bCap_Close(iSockFD);
     return 0;
+
+
+
 }
