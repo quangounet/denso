@@ -17,30 +17,31 @@ amax = array([ 19.73356519,  16.84469621,  20.70885517,  20.96646577,
 sampling = 0.008
 
 # Load the trajectory
-trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/constraintparabolicsmoothing.topptraj","r").read())
-trajref = trajref.ExtractDOFs([0,1,2])
+trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/bottle.topptraj","r").read())
+trajref = trajref.ExtractDOFs([0,1,2,3,4,5])
 
 # Compute the optimal waypoints
 nwaypoints = 4
 nsamples = 100
-cpos = 10000
+cpos = 10
 cvel = 10
-cacc = 0.01
-cdur = 0.01
-gainoptim = False
+cacc = 10
+cdur = 0
+gainoptim = True
 xopt = denso.FindOptTraj(trajref,nwaypoints,nsamples,[cpos,cvel,cacc,cdur],vmax,amax,gainoptim)
 ndof = trajref.dimension
 qstart = trajref.Eval(0)
 qend = trajref.Eval(trajref.duration)
 trajopt = denso.MakeTraj(xopt,qstart,qend,ndof,nwaypoints,vmax,amax)
 close('all')
-denso.PlotKinematics(trajref.Retime(trajopt.duration/trajref.duration),trajopt,dt=0.001,colorcycle=['r','g','b'],tstart=0)
+denso.PlotKinematics(trajref.Retime(trajopt.duration/trajref.duration),trajopt,dt=0.001,colorcycle=['r','g','b','m','c','y'],tstart=0)
 
 # Write the optimal waypoints into a pcs file
-nextracols = 3
+nextracols = 0
 qlist,vcoeflist,acoeflist = denso.ListFromVector(xopt,trajref.dimension,nwaypoints)
 qlist.insert(0,trajref.Eval(0))
 qlist.append(trajref.Eval(trajref.duration))
+denso.CreateProgramBCAP(qlist,"../data/bottle.waypoints",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
 #denso.CreateProgram(qlist,"../data/constraintparabolicsmoothingopt.pcs",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
 #open("../data/constraintparabolicsmoothingopt.topptraj","w").write(str(trajopt))
 

@@ -13,20 +13,20 @@ int main()
 
     /* Load file */
     std::vector<std::string> pointlist;
-    std::vector<std::string> vellist;
-    std::vector<std::string> acclist;
+    std::vector<std::string> gainlist;
     std::string line;
     std::ifstream handle;
-    handle.open("traj.waypoints");
-    handle.close();
+    handle.open("../data/bottle.waypoints");
     while(!handle.eof()) {
         std::getline(handle,line);
+        if(line.length()<2) {
+            break;
+        }
         pointlist.push_back(line);
         std::getline(handle,line);
-        vellist.push_back(line);
-        std::getline(handle,line);
-        acclist.push_back(line);
+        gainlist.push_back(line);
     }
+    handle.close();
 
     int iSockFD;
     uint32_t lhController;
@@ -44,6 +44,7 @@ int main()
 
 
     uint32_t lhRobot;
+    uint32_t lComp = 1;
     uint32_t lResult;
     /* Get robot handle */
     hr = bCap_ControllerGetRobot(iSockFD, lhController, "Arm", "", &lhRobot);
@@ -54,13 +55,14 @@ int main()
 
     /* Execute trajectory */
     // First waypoint
-    //hr = bCap_RobotMove(iSockFD, lhRobot, 1L, pointlist[0], vellist[0]);
-    std::cout << pointlist[0] << " " << vellist[0] << "\n";
+    std::cout << pointlist[0] << ", " << gainlist[0] << "\n";
+    hr = bCap_RobotMove(iSockFD, lhRobot, lComp, pointlist[0].c_str(), gainlist[0].c_str());
+    sleep(2);
 
-    // Intermediate waypoints
-    for(int i=1; i<int(pointlist.size())+1; i++) {
-        //hr = bCap_RobotMove(iSockFD, lhRobot, 1L, pointlist[i], vellist[i]);
-        std::cout << pointlist[i] << " " << vellist[i] << "\n";
+    //Intermediate waypoints
+    for(int i=1; i<int(pointlist.size()); i++) {
+        std::cout << i << ": " << pointlist[i] << ", " << gainlist[i] << "\n";
+        hr = bCap_RobotMove(iSockFD, lhRobot, lComp, pointlist[i].c_str(), gainlist[i].c_str());
     }
 
     /* Motor off */

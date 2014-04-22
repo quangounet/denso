@@ -194,7 +194,7 @@ def ObjFunc(x,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref):
     
 
 # Find the optimal sequence of waypoints to track a reference trajectory
-def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False):
+def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,maxiter=100000):
     ndof = trajref.dimension
     qstart = trajref.Eval(0)
     qend = trajref.Eval(trajref.duration)
@@ -216,7 +216,7 @@ def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False)
         x0bis[n:n+nwaypoints+1] = vcoeflist
         x0bis[n+nwaypoints+1:n+2*nwaypoints+2] = acoeflist
         x0 = x0bis
-    xopt = scipy.optimize.fmin_powell(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref))
+    xopt = scipy.optimize.minimize(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref),maxiter=maxiter)
     return xopt
 
 
@@ -271,6 +271,48 @@ def CreateProgram(qlist,filename,vcoeflist=[],acoeflist=[], nextracols=0):
     handle = open(filename,"w")
     handle.write(restring)
     handle.close()
+
+
+# Create a denso pcs program from a sequence of waypoints
+def CreateProgramBCAP(qlist,filename,vcoeflist=[],acoeflist=[], nextracols=0):
+    ndof = len(qlist[0])    
+    nwaypoints = len(qlist)-2
+    gainoptim = len(vcoeflist)>0
+    fullvalues = zeros(ndof+nextracols)
+    restring = ""
+
+    # First waypoint    
+    fullvalues[0:ndof] = qlist[0]*180/pi  
+    restring += "J(" + arraytostring(fullvalues) + ")\n" 
+    restring += "Speed=100, Accel=100\n"
+
+    # Intermediate waypoints
+    for i in range(nwaypoints):
+        fullvalues[0:ndof] = qlist[i+1]*180/pi  
+        restring += "@P J(" + arraytostring(fullvalues) + ")\n"
+        if gainoptim:
+            v = min(1,max(TINY,vcoeflist[i]))*100
+            a = min(1,max(TINY,acoeflist[i]))*100
+            restring += "Speed=" + str(v) + ", Accel=" + str(a)
+        else:
+            restring += "Speed=100, Accel=100"            
+        restring += "\n" 
+
+    # Final waypoint
+    fullvalues[0:ndof] = qlist[-1]*180/pi
+    restring += "@P J(" + arraytostring(fullvalues) + ")\n"
+    if gainoptim:
+        v = min(1,max(TINY,vcoeflist[-1]))*100
+        a = min(1,max(TINY,acoeflist[-1]))*100
+        restring += "Speed=" + str(v) + ", Accel=" + str(a)
+    else:
+        restring += "Speed=100, Accel=100"            
+    restring += "\n" 
+
+    handle = open(filename,"w")
+    handle.write(restring)
+    handle.close()
+
 
 
 # Plot the kinematics of the trajectories
