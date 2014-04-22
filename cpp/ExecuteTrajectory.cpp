@@ -1,10 +1,33 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+
 #include "b-Cap.c"
+
 #define SERVER_IP_ADDRESS "192.168.0.1"
 #define SERVER_PORT_NUM 5007
-#include <iostream>
 
 int main()
 {
+
+    /* Load file */
+    std::vector<std::string> pointlist;
+    std::vector<std::string> vellist;
+    std::vector<std::string> acclist;
+    std::string line;
+    std::ifstream handle;
+    handle.open("traj.waypoints");
+    handle.close();
+    while(!handle.eof()) {
+        std::getline(handle,line);
+        pointlist.push_back(line);
+        std::getline(handle,line);
+        vellist.push_back(line);
+        std::getline(handle,line);
+        acclist.push_back(line);
+    }
+
     int iSockFD;
     uint32_t lhController;
     BCAP_HRESULT hr = BCAP_S_OK;
@@ -17,29 +40,8 @@ int main()
 
     /* Start b-CAP service */
     hr = bCap_ServiceStart(iSockFD);
-
     hr = bCap_ControllerConnect(iSockFD, "b-CAP", "caoProv.DENSO.VRC", SERVER_IP_ADDRESS, "", &lhController);
 
-    // uint32_t lhVar;
-    // float lResult[6];
-
-    // /* Get variable handle */
-    // hr = bCap_ControllerGetVariable(iSockFD, lhController, "J0", "", &lhVar);
-
-    // lResult[0] = 90;
-    // lResult[3] = 90;
-    // bCap_VariablePutValue(iSockFD, lhVar, VT_ARRAY, 6, &lResult);
-
-    // /* Read variable */
-    // bCap_VariableGetValue(iSockFD, lhVar, &lResult);
-
-    // std::cout << "var 0: "<< lResult[0] << "\n";
-    // std::cout << "var 1: "<< lResult[1] << "\n";
-    // std::cout << "var 2: "<< lResult[2] << "\n";
-    // std::cout << "var 3: "<< lResult[3] << "\n";
-
-    // /* Release variable handle */
-    // bCap_VariableRelease(iSockFD, lhVar);
 
     uint32_t lhRobot;
     uint32_t lResult;
@@ -49,10 +51,18 @@ int main()
     hr = bCap_RobotExecute(iSockFD, lhRobot, "Takearm", "", &lResult);
     /* Motor on */
     hr = bCap_RobotExecute(iSockFD, lhRobot, "Motor", "1", &lResult);
-    /* Move to J0 */
-    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(0,0,0,0,0,0)", "Speed=50");
-    sleep(8);
-    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(0,0,90,0,-90,20)", "Speed=50");
+
+    /* Execute trajectory */
+    // First waypoint
+    //hr = bCap_RobotMove(iSockFD, lhRobot, 1L, pointlist[0], vellist[0]);
+    std::cout << pointlist[0] << " " << vellist[0] << "\n";
+
+    // Intermediate waypoints
+    for(int i=1; i<int(pointlist.size())+1; i++) {
+        //hr = bCap_RobotMove(iSockFD, lhRobot, 1L, pointlist[i], vellist[i]);
+        std::cout << pointlist[i] << " " << vellist[i] << "\n";
+    }
+
     /* Motor off */
     hr = bCap_RobotExecute(iSockFD, lhRobot, "Motor", "0", &lResult);
     /* Release arm control authority */
