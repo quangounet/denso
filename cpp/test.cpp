@@ -50,8 +50,9 @@ int main()
     /* Motor on */
     hr = bCap_RobotExecute(iSockFD, lhRobot, "Motor", "1", &lResult);
     /* Move to J0 */
-    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(90,0,0,0,0,0)", "Speed=100");
-    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(135,0,0,0,0,0)", "Speed=50");
+    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(0,0,0,0,0,0)", "Speed=50");
+    sleep(8);
+    hr = bCap_RobotMove(iSockFD, lhRobot, 1L, "J(0,0,90,0,-90,20)", "Speed=50");
     /* Motor off */
     hr = bCap_RobotExecute(iSockFD, lhRobot, "Motor", "0", &lResult);
     /* Release arm control authority */
