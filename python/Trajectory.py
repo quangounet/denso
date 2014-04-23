@@ -135,20 +135,20 @@ class PiecewisePolynomialTrajectory():
         i, remainder = self.FindChunkIndex(s)
         return self.chunkslist[i].Evaldd(remainder)
 
-    def Plot(self, dt, f='',tstart=0):
+    def Plot(self, dt, f='',tstart=0,c=1):
         tvect = arange(0, self.duration + dt, dt)
         qvect = array([self.Eval(t) for t in tvect])
-        plot(tvect+tstart, qvect, f, linewidth=2)
+        plot(c*tvect+tstart, qvect, f, linewidth=2)
 
-    def Plotd(self, dt, f='',tstart=0):
+    def Plotd(self, dt, f='',tstart=0,c=1):
         tvect = arange(0, self.duration + dt, dt)
         qdvect = array([self.Evald(t) for t in tvect])
-        plot(tvect+tstart, qdvect, f, linewidth=2)
+        plot(c*tvect+tstart, qdvect, f, linewidth=2)
 
-    def Plotdd(self, dt, f='',tstart=0):
+    def Plotdd(self, dt, f='',tstart=0,c=1):
         tvect = arange(0, self.duration + dt, dt)
         qddvect = array([self.Evaldd(t) for t in tvect])
-        plot(tvect+tstart, qddvect, f, linewidth=2)
+        plot(c*tvect+tstart, qddvect, f, linewidth=2)
 
     def Retime(self,coef):
         return PiecewisePolynomialTrajectory([c.Retime(coef) for c in self.chunkslist])
@@ -237,6 +237,20 @@ def Diff(traj1,traj2,nsamples):
         deltapos = traja.Eval(t) - trajb.Eval(t)
         deltavel = traja.Evald(t) - trajb.Evald(t)
         deltaacc = traja.Evaldd(t) - trajb.Evaldd(t)
+        dpos += dot(deltapos,deltapos)
+        dvel += dot(deltavel,deltavel)
+        dacc += dot(deltaacc,deltaacc)
+    return sqrt(dpos)/nsamples, sqrt(dvel)/nsamples, sqrt(dacc)/nsamples
+
+def Diff2(traj1,traj2,nsamples):
+    dpos = 0
+    dvel = 0
+    dacc = 0
+    c = traj2.duration/traj1.duration
+    for t in linspace(0,traj1.duration,nsamples):
+        deltapos = traj1.Eval(t) - traj2.Eval(t*c)
+        deltavel = traj1.Evald(t) - traj2.Evald(t*c)
+        deltaacc = traj1.Evaldd(t) - traj2.Evaldd(t*c)
         dpos += dot(deltapos,deltapos)
         dvel += dot(deltavel,deltavel)
         dacc += dot(deltaacc,deltaacc)

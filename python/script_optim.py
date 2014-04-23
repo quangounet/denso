@@ -21,20 +21,20 @@ trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/bott
 trajref = trajref.ExtractDOFs([0,1,2,3,4,5])
 
 # Compute the optimal waypoints
-nwaypoints = 4
+nwaypoints = 5
 nsamples = 100
-cpos = 10
+cpos = 1000
 cvel = 10
-cacc = 10
+cacc = 1
 cdur = 0
 gainoptim = True
-xopt = denso.FindOptTraj(trajref,nwaypoints,nsamples,[cpos,cvel,cacc,cdur],vmax,amax,gainoptim)
+xopt = denso.FindOptTraj(trajref,nwaypoints,nsamples,[cpos,cvel,cacc,cdur],vmax,amax,gainoptim,maxiter=5000)
 ndof = trajref.dimension
 qstart = trajref.Eval(0)
 qend = trajref.Eval(trajref.duration)
 trajopt = denso.MakeTraj(xopt,qstart,qend,ndof,nwaypoints,vmax,amax)
 close('all')
-denso.PlotKinematics(trajref.Retime(trajopt.duration/trajref.duration),trajopt,dt=0.001,colorcycle=['r','g','b','m','c','y'],tstart=0)
+denso.PlotKinematics(trajref,trajopt,dt=0.001,colorcycle=['r','g','b','m','c','y'],tstart=0,rescale=True)
 
 # Write the optimal waypoints into a pcs file
 nextracols = 0

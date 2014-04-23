@@ -186,7 +186,7 @@ def MakeTraj(x,qstart,qend,ndof,nwaypoints,vmax,amax):
 # Objective function for waypoint optimization
 def ObjFunc(x,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref):
     traj = MakeTraj(x,qstart,qend,ndof,nwaypoints,vmax,amax)
-    dpos, dvel, dacc = Trajectory.Diff(traj,trajref,nsamples)
+    dpos, dvel, dacc = Trajectory.Diff2(traj,trajref,nsamples)
     cpos, cvel, cacc, cdur = weights
     cost = cpos*dpos*dpos + cvel*dvel*dvel + cacc*dacc*dacc + cdur*(traj.duration-trajref.duration)
     print cost, cpos*dpos*dpos, cvel*dvel*dvel, cacc*dacc*dacc, cdur*(traj.duration-trajref.duration)
@@ -194,7 +194,7 @@ def ObjFunc(x,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref):
     
 
 # Find the optimal sequence of waypoints to track a reference trajectory
-def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,maxiter=100000):
+def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,maxiter=None):
     ndof = trajref.dimension
     qstart = trajref.Eval(0)
     qend = trajref.Eval(trajref.duration)
@@ -216,7 +216,7 @@ def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,
         x0bis[n:n+nwaypoints+1] = vcoeflist
         x0bis[n+nwaypoints+1:n+2*nwaypoints+2] = acoeflist
         x0 = x0bis
-    xopt = scipy.optimize.minimize(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref),maxiter=maxiter)
+    xopt = scipy.optimize.fmin(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref),maxiter=maxiter)
     return xopt
 
 
@@ -316,7 +316,7 @@ def CreateProgramBCAP(qlist,filename,vcoeflist=[],acoeflist=[], nextracols=0):
 
 
 # Plot the kinematics of the trajectories
-def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcycle = ['r', 'g', 'b', 'm', 'c', 'y', 'k'],tstart=0):
+def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcycle = ['r', 'g', 'b', 'm', 'c', 'y', 'k'],tstart=0,rescale=False):
     from pylab import figure, clf, hold, gca, title, xlabel, ylabel, plot, axis
     colorcycle = colorcycle[0:traj0.dimension]
     if traj0 is None:
@@ -325,6 +325,10 @@ def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcyc
         Tmax = traj0.duration
     else:
         Tmax = max(traj0.duration, traj1.duration)
+
+    c=1
+    if rescale:
+        c = traj0.duration/traj1.duration
 
     # Joint angles
     figure(figstart)
@@ -335,7 +339,7 @@ def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcyc
         traj0.Plot(dt, f='--',tstart=tstart)
     ax.set_color_cycle(colorcycle)
     if(traj1!=None):
-        traj1.Plot(dt,tstart=tstart)
+        traj1.Plot(dt,tstart=tstart,c=c)
     title('Joint values', fontsize=20)
     xlabel('Time (s)', fontsize=18)
     ylabel('Joint values (rad)', fontsize=18)
@@ -349,7 +353,7 @@ def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcyc
         traj0.Plotd(dt, f='--',tstart=tstart)
     ax.set_color_cycle(colorcycle)
     if(traj1!=None):
-        traj1.Plotd(dt,tstart=tstart)
+        traj1.Plotd(dt,tstart=tstart,c=c)
     for v in vmax:
         plot([0, Tmax], [v, v], '-.')
     for v in vmax:
@@ -372,7 +376,7 @@ def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcyc
         traj0.Plotdd(dt, f='--',tstart=tstart)
     ax.set_color_cycle(colorcycle)
     if(traj1!=None):
-        traj1.Plotdd(dt,tstart=tstart)
+        traj1.Plotdd(dt,tstart=tstart,c=c)
     for a in amax:
         plot([0, Tmax], [a, a], '-.')
     for a in amax:
