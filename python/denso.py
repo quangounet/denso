@@ -194,7 +194,7 @@ def ObjFunc(x,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref):
     
 
 # Find the optimal sequence of waypoints to track a reference trajectory
-def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,maxiter=None):
+def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,maxiter=None,maxfun=None):
     ndof = trajref.dimension
     qstart = trajref.Eval(0)
     qend = trajref.Eval(trajref.duration)
@@ -216,7 +216,7 @@ def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,
         x0bis[n:n+nwaypoints+1] = vcoeflist
         x0bis[n+nwaypoints+1:n+2*nwaypoints+2] = acoeflist
         x0 = x0bis
-    xopt = scipy.optimize.fmin(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref),maxiter=maxiter)
+    xopt = scipy.optimize.fmin(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref),maxiter=maxiter,maxfun=maxfun)
     return xopt
 
 
