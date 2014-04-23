@@ -21,14 +21,14 @@ trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/dens
 trajref = trajref.ExtractDOFs([0,1,2,3,4,5])
 
 # Compute the optimal waypoints
-nwaypoints = 5
-nsamples = 100
+nwaypoints = 10
+nsamples = 200
 cpos = 1000
 cvel = 10
-cacc = 1
+cacc = 0.01
 cdur = 0
 gainoptim = True
-xopt = denso.FindOptTraj(trajref,nwaypoints,nsamples,[cpos,cvel,cacc,cdur],vmax,amax,gainoptim,maxiter=10000,maxfun=100000)
+xopt = denso.FindOptTraj(trajref,nwaypoints,nsamples,[cpos,cvel,cacc,cdur],vmax,amax,gainoptim,maxfun=200)
 ndof = trajref.dimension
 qstart = trajref.Eval(0)
 qend = trajref.Eval(trajref.duration)
@@ -41,7 +41,6 @@ nextracols = 0
 qlist,vcoeflist,acoeflist = denso.ListFromVector(xopt,trajref.dimension,nwaypoints)
 qlist.insert(0,trajref.Eval(0))
 qlist.append(trajref.Eval(trajref.duration))
-denso.CreateProgramBCAP(qlist,"../data/bottle.4.waypoints",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
+denso.CreateProgramBCAP(qlist,"../data/bottle.waypoints",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
 #denso.CreateProgram(qlist,"../data/constraintparabolicsmoothingopt.pcs",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
 #open("../data/constraintparabolicsmoothingopt.topptraj","w").write(str(trajopt))
-

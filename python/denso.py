@@ -207,7 +207,9 @@ def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,
         vcoeflist = ones(nwaypoints+1)
         acoeflist = ones(nwaypoints+1)
         for i in range(nwaypoints+1):
-            v,a = GuessGain(trajref,(waypoints[i]+waypoints[i+1])/2,vmax,amax)
+            subsamples = int(nsamples*(waypoints[i+1]-waypoints[i])/trajref.duration)
+            v,a = GuessGain(trajref,waypoints[i],waypoints[i+1],subsamples+1,vmax,amax)
+            print v,a
             vcoeflist[i] = v
             acoeflist[i] = a
         n = ndof*nwaypoints
@@ -217,13 +219,29 @@ def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,
         x0bis[n+nwaypoints+1:n+2*nwaypoints+2] = acoeflist
         x0 = x0bis
     xopt = scipy.optimize.fmin(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref),maxiter=maxiter,maxfun=maxfun)
+    print "Final: ",ObjFunc(xopt,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref)
     return xopt
 
 
 # Guess the velocity and acceleration gain at a time instant
-def GuessGain(trajref,t,vmax,amax):
-    return 1,1
-    
+def GuessGain(trajref,t0,t1,subsamples,vmax,amax):
+    samplepoints = linspace(t0,t1,subsamples)
+    ndof = trajref.dimension
+    vm = zeros(ndof)
+    am = zeros(ndof)
+    for t in samplepoints:
+        v = trajref.Evald(t)
+        a = trajref.Evaldd(t)
+        for i in range(ndof):
+            vm[i] += v[i]
+            am[i] += a[i]
+    vcoef = zeros(ndof)
+    acoef = zeros(ndof)
+    for i in range(ndof):
+        vcoef[i]=vm[i]/subsamples/vmax[i]
+        acoef[i]=am[i]/subsamples/amax[i]
+    return max(vcoef),max(acoef)
+
 
 # Array to string
 def arraytostring(a):

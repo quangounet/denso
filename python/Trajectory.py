@@ -253,5 +253,5 @@ def Diff2(traj1,traj2,nsamples):
         deltaacc = traj1.Evaldd(t) - traj2.Evaldd(t*c)
         dpos += dot(deltapos,deltapos)
         dvel += dot(deltavel,deltavel)
-        dacc += dot(deltaacc,deltaacc)
+        dacc += dot(deltaacc,deltaacc)**2
     return sqrt(dpos)/nsamples, sqrt(dvel)/nsamples, sqrt(dacc)/nsamples
