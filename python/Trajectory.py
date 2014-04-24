@@ -150,6 +150,27 @@ class PiecewisePolynomialTrajectory():
         qddvect = array([self.Evaldd(t) for t in tvect])
         plot(c*tvect+tstart, qddvect, f, linewidth=2)
 
+    def Plotendeff(self, dt, f='',tstart=0,c=1,robot=None):
+        tvect = arange(0, self.duration + dt, dt)
+        vlin = []
+        vang = []
+        alin = []
+        aang = []
+        for t in tvect:
+            robot.SetDOFValues(self.Eval(t))
+            robot.SetDOFVelocities(self.Evald(t))
+            vv = robot.GetLinkVelocities()[-1]
+            aa = robot.GetLinkAccelerations(self.Evaldd(t))[-1]
+            vlin.append(dot(vv[0:3],vv[0:3]))
+            vang.append(dot(vv[3:6],vv[3:6]))
+            alin.append(dot(aa[0:3],aa[0:3]))
+            aang.append(dot(aa[3:6],aa[3:6]))
+        plot(c*tvect+tstart, vlin, "r"+f, linewidth=2)
+        plot(c*tvect+tstart, vang, "m"+f, linewidth=2)
+        plot(c*tvect+tstart, sqrt(array(alin))/2, "b"+f, linewidth=2)
+        plot(c*tvect+tstart, sqrt(array(aang))/2, "c"+f, linewidth=2)
+
+
     def Retime(self,coef):
         return PiecewisePolynomialTrajectory([c.Retime(coef) for c in self.chunkslist])
 
@@ -254,4 +275,33 @@ def Diff2(traj1,traj2,nsamples):
         dpos += dot(deltapos,deltapos)
         dvel += dot(deltavel,deltavel)
         dacc += dot(deltaacc,deltaacc)**2
+    return sqrt(dpos)/nsamples, sqrt(dvel)/nsamples, sqrt(dacc)/nsamples
+
+def Diff3(traj1,traj2,nsamples,robot=None):
+    dpos = 0
+    dvel = 0
+    dacc = 0
+    c = traj2.duration/traj1.duration
+    bottlelen = 0.2
+    for t in linspace(0,traj1.duration,nsamples):
+        deltapos = traj1.Eval(t) - traj2.Eval(t*c)
+        with robot:
+            # Traj 1
+            robot.SetDOFValues(traj1.Eval(t))
+            robot.SetDOFVelocities(traj1.Evald(t))
+            endeffvel1 = robot.GetLinkVelocities()[-1]
+            endeffacc1 = robot.GetLinkAccelerations(traj1.Evaldd(t))[-1]
+            # Traj 2
+            robot.SetDOFValues(traj1.Eval(t*c))
+            robot.SetDOFVelocities(traj1.Evald(t*c))
+            endeffvel2 = robot.GetLinkVelocities()[-1]
+            endeffacc2 = robot.GetLinkAccelerations(traj2.Evaldd(c*t))[-1]
+            # Diff
+            vv = endeffvel2 - endeffvel1
+            aa = endeffacc2 - endeffacc1        
+        deltavel = dot(vv[0:3],vv[0:3]) + dot(vv[3:6],vv[3:6])*bottlelen
+        deltaacc = dot(aa[0:3],aa[0:3]) + dot(aa[3:6],aa[3:6])*bottlelen
+        dpos += dot(deltapos,deltapos)
+        dvel += deltavel
+        dacc += deltaacc
     return sqrt(dpos)/nsamples, sqrt(dvel)/nsamples, sqrt(dacc)/nsamples

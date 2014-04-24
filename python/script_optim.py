@@ -3,8 +3,14 @@
 
 from pylab import *
 from numpy import *
-import Trajectory
 import denso
+from openravepy import *
+import Trajectory
+
+
+env = Environment()
+env.Load("/home/cuong/git/cri1/robots/denso-vs060.zae")
+robot = env.GetRobots()[0]
 
 
 ion()
@@ -21,20 +27,20 @@ trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/dens
 trajref = trajref.ExtractDOFs([0,1,2,3,4,5])
 
 # Compute the optimal waypoints
-nwaypoints = 10
+nwaypoints = 11
 nsamples = 200
 cpos = 1000
-cvel = 10
-cacc = 0.01
+cvel = 1000
+cacc = 10
 cdur = 0
 gainoptim = True
-xopt = denso.FindOptTraj(trajref,nwaypoints,nsamples,[cpos,cvel,cacc,cdur],vmax,amax,gainoptim,maxfun=200)
+xopt = denso.FindOptTraj(trajref,nwaypoints,nsamples,[cpos,cvel,cacc,cdur],vmax,amax,gainoptim,robot=robot,maxfun=300)
 ndof = trajref.dimension
 qstart = trajref.Eval(0)
 qend = trajref.Eval(trajref.duration)
 trajopt = denso.MakeTraj(xopt,qstart,qend,ndof,nwaypoints,vmax,amax)
 close('all')
-denso.PlotKinematics(trajref,trajopt,dt=0.001,colorcycle=['r','g','b','m','c','y'],tstart=0,rescale=True)
+denso.PlotKinematics(trajref,trajopt,dt=0.001,colorcycle=['r','g','b','m','c','y'],tstart=0,robot=robot,rescale=True)
 
 # Write the optimal waypoints into a pcs file
 nextracols = 0

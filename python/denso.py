@@ -1,6 +1,7 @@
 from pylab import *
 from numpy import *
 import scipy.optimize
+from openravepy import *
 import Trajectory
 
 TINY = 1e-5
@@ -184,9 +185,9 @@ def MakeTraj(x,qstart,qend,ndof,nwaypoints,vmax,amax):
         
 
 # Objective function for waypoint optimization
-def ObjFunc(x,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref):
+def ObjFunc(x,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref,robot):
     traj = MakeTraj(x,qstart,qend,ndof,nwaypoints,vmax,amax)
-    dpos, dvel, dacc = Trajectory.Diff2(traj,trajref,nsamples)
+    dpos, dvel, dacc = Trajectory.Diff3(traj,trajref,nsamples,robot)
     cpos, cvel, cacc, cdur = weights
     cost = cpos*dpos*dpos + cvel*dvel*dvel + cacc*dacc*dacc + cdur*(traj.duration-trajref.duration)
     print cost, cpos*dpos*dpos, cvel*dvel*dvel, cacc*dacc*dacc, cdur*(traj.duration-trajref.duration)
@@ -194,7 +195,7 @@ def ObjFunc(x,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref):
     
 
 # Find the optimal sequence of waypoints to track a reference trajectory
-def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,maxiter=None,maxfun=None):
+def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,robot=None,maxiter=None,maxfun=None):
     ndof = trajref.dimension
     qstart = trajref.Eval(0)
     qend = trajref.Eval(trajref.duration)
@@ -218,8 +219,8 @@ def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,
         x0bis[n:n+nwaypoints+1] = vcoeflist
         x0bis[n+nwaypoints+1:n+2*nwaypoints+2] = acoeflist
         x0 = x0bis
-    xopt = scipy.optimize.fmin(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref),maxiter=maxiter,maxfun=maxfun)
-    print "Final: ",ObjFunc(xopt,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref)
+    xopt = scipy.optimize.fmin(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref,robot),maxiter=maxiter,maxfun=maxfun)
+    print "Final: ",ObjFunc(xopt,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref,robot)
     return xopt
 
 
@@ -233,14 +234,14 @@ def GuessGain(trajref,t0,t1,subsamples,vmax,amax):
         v = trajref.Evald(t)
         a = trajref.Evaldd(t)
         for i in range(ndof):
-            vm[i] += v[i]
-            am[i] += a[i]
+            vm[i] += abs(v[i])
+            am[i] += abs(a[i])
     vcoef = zeros(ndof)
     acoef = zeros(ndof)
     for i in range(ndof):
         vcoef[i]=vm[i]/subsamples/vmax[i]
         acoef[i]=am[i]/subsamples/amax[i]
-    return max(vcoef),max(acoef)
+    return max(vcoef),max(vcoef)
 
 
 # Array to string
@@ -334,7 +335,7 @@ def CreateProgramBCAP(qlist,filename,vcoeflist=[],acoeflist=[], nextracols=0):
 
 
 # Plot the kinematics of the trajectories
-def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcycle = ['r', 'g', 'b', 'm', 'c', 'y', 'k'],tstart=0,rescale=False):
+def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcycle = ['r', 'g', 'b', 'm', 'c', 'y', 'k'],tstart=0,robot=None,rescale=False):
     from pylab import figure, clf, hold, gca, title, xlabel, ylabel, plot, axis
     colorcycle = colorcycle[0:traj0.dimension]
     if traj0 is None:
@@ -405,6 +406,20 @@ def PlotKinematics(traj0, traj1, dt=0.01, vmax=[], amax=[], figstart=0, colorcyc
     title('Joint accelerations', fontsize=20)
     xlabel('Time (s)', fontsize=18)
     ylabel('Joint accelerations (rad/s^2)', fontsize=18)
+
+    # End effector
+    figure(figstart + 3)
+    ax = gca()
+    ax.set_color_cycle(colorcycle)
+    hold('on')
+    if(traj0!=None):
+        traj0.Plotendeff(dt, f='--',tstart=tstart,robot=robot)
+    ax.set_color_cycle(colorcycle)
+    if(traj1!=None):
+        traj1.Plotendeff(dt,tstart=tstart,c=c,robot=robot)
+    title('End effector velocities and accelerations', fontsize=20)
+    xlabel('Time (s)', fontsize=18)
+
 
 
 # Detect the onset of a signal
