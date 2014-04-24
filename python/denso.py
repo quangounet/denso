@@ -219,7 +219,7 @@ def FindOptTraj(trajref,nwaypoints,nsamples,weights,vmax,amax,gainoptim = False,
         x0bis[n:n+nwaypoints+1] = vcoeflist
         x0bis[n+nwaypoints+1:n+2*nwaypoints+2] = acoeflist
         x0 = x0bis
-    xopt = scipy.optimize.fmin(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref,robot),maxiter=maxiter,maxfun=maxfun)
+    xopt = scipy.optimize.fmin_powell(ObjFunc,x0,args=(qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref,robot),maxiter=maxiter,maxfun=maxfun)
     print "Final: ",ObjFunc(xopt,qstart,qend,ndof,nwaypoints,nsamples,weights,vmax,amax,trajref,robot)
     return xopt
 
