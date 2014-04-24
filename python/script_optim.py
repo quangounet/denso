@@ -23,11 +23,11 @@ amax = array([ 19.73356519,  16.84469621,  20.70885517,  20.96646577,
 sampling = 0.008
 
 # Load the trajectory
-trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/denso1.traj","r").read())
+trajref = Trajectory.PiecewisePolynomialTrajectory.FromString(open("../data/denso4.traj","r").read())
 trajref = trajref.ExtractDOFs([0,1,2,3,4,5])
 
 # Compute the optimal waypoints
-nwaypoints = 12
+nwaypoints = 13
 nsamples = 200
 cpos = 1000
 cvel = 1000
@@ -47,6 +47,6 @@ nextracols = 0
 qlist,vcoeflist,acoeflist = denso.ListFromVector(xopt,trajref.dimension,nwaypoints)
 qlist.insert(0,trajref.Eval(0))
 qlist.append(trajref.Eval(trajref.duration))
-denso.CreateProgramBCAP(qlist,"../data/bottle.12.waypoints",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
+denso.CreateProgramBCAP(qlist,"../data/denso4.10.waypoints",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
 #denso.CreateProgram(qlist,"../data/constraintparabolicsmoothingopt.pcs",vcoeflist=vcoeflist,acoeflist=acoeflist,nextracols=nextracols)
 #open("../data/constraintparabolicsmoothingopt.topptraj","w").write(str(trajopt))
