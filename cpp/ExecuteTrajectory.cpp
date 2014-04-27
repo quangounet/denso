@@ -16,7 +16,7 @@ int main()
     std::vector<std::string> gainlist;
     std::string line;
     std::ifstream handle;
-    handle.open("../data/bottle.waypoints");
+    handle.open("../data/waypoints");
     while(!handle.eof()) {
         std::getline(handle,line);
         if(line.length()<2) {
@@ -57,7 +57,7 @@ int main()
     // First waypoint
     std::cout << pointlist[0] << ", " << gainlist[0] << "\n";
     hr = bCap_RobotMove(iSockFD, lhRobot, lComp, pointlist[0].c_str(), gainlist[0].c_str());
-    sleep(2);
+    sleep(5);
 
     //Intermediate waypoints
     for(int i=1; i<int(pointlist.size()); i++) {
