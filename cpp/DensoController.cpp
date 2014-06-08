@@ -165,6 +165,15 @@ void DensoController::bCapExitProcess() {
     bCapClose();
 }
 
+BCAP_HRESULT DensoController::SetExtSpeed(const char* speed) {
+    BCAP_HRESULT hr;
+    hr = bCapRobotExecute("ExtSpeed", speed);
+    if SUCCEEDED(hr) {
+        std::cout << "External speed is set to " << speed << " %\n";
+    }
+    return hr;
+}
+
 std::vector<double> DensoController::GetCurJnt() {
     BCAP_HRESULT hr;
     double dJnt[8];
