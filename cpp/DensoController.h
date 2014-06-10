@@ -51,6 +51,8 @@ public:
     void bCapEnterProcess();
     void bCapExitProcess();
 
+    BCAP_HRESULT SetExtSpeed(const char* speed);
+
     std::vector<double> GetCurJnt();
     std::vector<double> VectorFromVNT(BCAP_VARIANT vnt0);
     BCAP_VARIANT VNTFromVector(std::vector<double> vect0);
