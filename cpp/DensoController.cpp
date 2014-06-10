@@ -1,5 +1,10 @@
 #include "DensoController.h"
 #include <iostream>
+#include <math.h>
+#include <time.h>
+
+
+#define PI 3.1415926535897932
 
 namespace DensoController {
 
@@ -206,11 +211,60 @@ BCAP_VARIANT DensoController::VNTFromVector(std::vector<double> vect0) {
     vnt.Type = VT_R8 | VT_ARRAY;
     vnt.Arrays = 8;
 
-    for (int i = 0; i < vect0.size(); i++) {
+    for (int i = 0; i < int(vect0.size()); i++) {
         vnt.Value.DoubleArray[i] = vect0[i];
     }
     return vnt;
 }
 
+std::vector<double> DensoController::RadVectorFromVNT(BCAP_VARIANT vnt0) {
+    std::vector<double> vect;
+    vect.resize(0);
+    for (int i = 0; i < 8; i++) {
+        vect.push_back(Deg2Rad(vnt0.Value.DoubleArray[i]));
+    }
+    return vect;
+}
+
+BCAP_VARIANT DensoController::VNTFromRadVector(std::vector<double> vect0) {
+    assert(vect0.size() == 6 || vect0.size() == 8);
+    BCAP_VARIANT vnt;
+    vnt.Type = VT_R8 | VT_ARRAY;
+    vnt.Arrays = 8;
+
+    for (int i = 0; i < int(vect0.size()); i++) {
+        vnt.Value.DoubleArray[i] = Rad2Deg(vect0[i]);
+    }
+    return vnt;
+}
+
+std::vector<double> VRad2Deg(std::vector<double> vect0) {
+    std::vector<double> resvect;
+    resvect.resize(0);
+    for (int i = 0; i < int(vect0.size()); i++) {
+        resvect.push_back(Rad2Deg(vect0[i]));
+    }
+    return resvect;
+}
+
+double Rad2Deg(double x) {
+    double res = x * 180.0 / PI;
+    if (res >= 0) {
+        return fmod(res, 360.0);
+    }
+    else{
+        return -1.0 * fmod(-1.0 * res, 360.0);
+    }
+}
+
+double Deg2Rad(double x) {
+    // double res;
+    if (x >= 0) {
+        return fmod(x, 360.0) * PI / 180.0;
+    }
+    else{
+        return -1.0 * fmod(-1.0 * x, 360.0) * PI / 180;
+    }
+}
 
 } //
