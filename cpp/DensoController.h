@@ -3,6 +3,8 @@
 #include <string>
 #include <cassert>
 #include <boost/typeof/std/vector.hpp>
+#include "../../TOPP/src/TOPP.h"
+
 #define DEFAULT_SERVER_IP_ADDRESS    "192.168.0.1"
 #define DEFAULT_SERVER_PORT_NUM      5007
 
@@ -55,8 +57,11 @@ public:
 
     std::vector<double> GetCurJnt();
     std::vector<double> VectorFromVNT(BCAP_VARIANT vnt0);
+    std::vector<double> RadVectorFromVNT(BCAP_VARIANT vnt0);
     BCAP_VARIANT VNTFromVector(std::vector<double> vect0);
+    BCAP_VARIANT VNTFromRadVector(std::vector<double> vect0);
 
+    // class variables
     const char* server_ip_address;
     int server_port_num;
     int iSockFD;
@@ -64,5 +69,12 @@ public:
     uint32_t lhRobot;
 
 };
+
+
+////////////////////////////// Utilities //////////////////////////////
+std::vector<double> VRad2Deg(std::vector<double> vect0);
+
+double Rad2Deg(double x);
+double Deg2Rad(double x);
 
 } // end namespace DensoController
