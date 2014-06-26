@@ -99,6 +99,10 @@ def Normalize(vect0):
     assert(not vect_norm == 0)
     return vect0/vect_norm
 
+def VRad2Deg(vect0):
+    vect = [np.rad2deg(k) for k in vect0]
+    return np.asarray(vect)
+
 ############################## PLOTTING ##############################
 
 def PlotDOF(robot, traj, dt, dof = -1):
@@ -125,8 +129,8 @@ def PlotDOF(robot, traj, dt, dof = -1):
         plt.plot(T, x)
         plt.show(False)
         plt.hold(True)
-        plt.plot([T[0], T[-1]], [lowerdof_lim[i], lowerdof_lim[i]], '--')
-        plt.plot([T[0], T[-1]], [upperdof_lim[i], upperdof_lim[i]], '--')
+        plt.plot([T[0], T[-1]], [lowerdof_lim[dof], lowerdof_lim[dof]], '--')
+        plt.plot([T[0], T[-1]], [upperdof_lim[dof], upperdof_lim[dof]], '--')
             
 
 def PlotdDOF(robot, traj, dt, dof = -1):
@@ -179,6 +183,48 @@ def PlotddDOF(robot, traj, dt, dof = -1):
         plt.plot(T, xdd)
         plt.show(False)
         plt.hold(True)
-        plt.plot([T[0], T[-1]], [-acc_lim[i], -acc_lim[i]], '--')
-        plt.plot([T[0], T[-1]], [acc_lim[i], acc_lim[i]], '--')
+        plt.plot([T[0], T[-1]], [-acc_lim[dof], -acc_lim[dof]], '--')
+        plt.plot([T[0], T[-1]], [acc_lim[dof], acc_lim[dof]], '--')
         
+
+def PlotDOFDeg(traj, dt, dof = -1):
+    ndof = traj.dimension
+    q = []
+    T = arange(0, traj.duration, dt)
+    for t in T:
+        q.append(traj.Eval(t))
+    
+    if (dof == -1):
+        for i in range(ndof):
+            plt.figure()
+            x = [np.rad2deg(k[i]) for k in q]
+            plt.plot(T, x)
+            plt.show(False)
+            plt.hold(True)
+    else:
+        plt.figure()
+        x = [np.rad2deg(k[dof]) for k in q]
+        plt.plot(T, x)
+        plt.show(False)
+        plt.hold(True)
+            
+def PlotdDOFDeg(traj, dt, dof = -1):
+    ndof = traj.dimension
+    qd = []
+    T = arange(0, traj.duration, dt)
+    for t in T:
+        qd.append(traj.Evald(t))
+    
+    if (dof == -1):
+        for i in range(ndof):
+            plt.figure()
+            xd = [np.rad2deg(k[i]) for k in qd]
+            plt.plot(T, xd)
+            plt.show(False)
+            plt.hold(True)
+    else:
+        plt.figure()
+        xd = [np.rad2deg(k[dof]) for k in qd]
+        plt.plot(T, xd)
+        plt.show(False)
+        plt.hold(True)
