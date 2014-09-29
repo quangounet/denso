@@ -3,8 +3,26 @@
 #include <time.h>
 #include <chrono>
 #include <fstream>
+#include <string>
+
 
 /// data loaded is already a table
+
+
+void VectorFromString(std::string& s, std::vector<dReal>& resvect) {
+    s.erase(std::find_if (s.rbegin(), s.rend(), std::bind1st(std::not_equal_to<char>(), ' ')).base(), s.end()); //remove trailing spaces
+    std::istringstream iss(s);
+    std::string sub;
+    dReal value;
+    resvect.resize(0);
+    while (iss.good()) {
+        iss >> sub;
+        value = atof(sub.c_str());
+        resvect.push_back(value);
+    }
+}
+
+
 
 int main() {
     std::string filename = "../data/table1.traj";
@@ -16,16 +34,17 @@ int main() {
 
     //////////////////// Get table from a file ////////////////////
     std::ifstream myfile(filename);
-    std::string temp;
-    std::vector<std::string> trajtable;
-    trajtable.resize(0);
+    std::string buff;
+    std::vector<std::vector<dReal> > qvector;
+    std::vector<dReal> q;
 
-    std::getline(myfile, temp);
-    trajtable.push_back(temp);
-    while (std::getline(myfile, temp)) {
-        trajtable.push_back(temp);
+    qvector.resize(0);
+
+    while(myfile.good()) {
+        getline(myfile, buff, '\n');
+        VectorFromString(buff, q);
+	qvector.push_back(q);
     }
-
 
 
 
@@ -47,14 +66,15 @@ int main() {
     // std::cout << "Moving to the initial pose...\n";
 
     // ptraj->Eval(0.0, q);
-    // tmp = DensoController::VRad2Deg(q);
-    // std::string commandstring;
-    // const char* command;
-    // commandstring = "J(" + std::to_string(tmp[0]) + ", " + std::to_string(tmp[1])
-    //                 + ", " + std::to_string(tmp[2]) + ", " + std::to_string(tmp[3])
-    //                 + ", " + std::to_string(tmp[4]) + ", " + std::to_string(tmp[5]) + ")";
-    // command = commandstring.c_str(); // convert string -> const shar*
-    // std::cout << commandstring << "\n";
+    std::vector<double> tmp;
+    tmp = DensoController::VRad2Deg(qvector[0]);
+    std::string commandstring;
+    const char* command;
+    commandstring = "J(" + std::to_string(tmp[0]) + ", " + std::to_string(tmp[1])
+                    + ", " + std::to_string(tmp[2]) + ", " + std::to_string(tmp[3])
+                    + ", " + std::to_string(tmp[4]) + ", " + std::to_string(tmp[5]) + ")";
+    command = commandstring.c_str(); // convert string -> const shar*
+    std::cout << commandstring << "\n";
     std::string command = trajtable[0];
     denso.bCapRobotMove(command, "Speed = 25");
     sleep(5);
@@ -62,20 +82,20 @@ int main() {
     hr = denso.bCapRobotExecute("ClearLog", ""); // enable control logging
 
     //////////////////// Build a LUT for the Trajectory ////////////////////
-    double s = 0.0;
-    double slower = 1.0;
-    double timestep = 8.0*(1e-3)*slower;
-    std::stringstream t;
-    std::vector<std::vector<double> > LUT;
-    std::cout << "Building a look-up table for the trajectory. . ." << "\n";
-    while (s < ptraj->duration) {
-        ptraj->Eval(s, q);
-        LUT.push_back(q);
-        t << std::setprecision(17) << s << " ";
-        s += timestep;
-    }
+    // double s = 0.0;
+    // double slower = 1.0;
+    // double timestep = 8.0*(1e-3)*slower;
+    // std::stringstream t;
+    // std::vector<std::vector<double> > LUT;
+    // std::cout << "Building a look-up table for the trajectory. . ." << "\n";
+    // while (s < ptraj->duration) {
+    //     ptraj->Eval(s, q);
+    //     LUT.push_back(q);
+    //     t << std::setprecision(17) << s << " ";
+    //     s += timestep;
+    // }
 
-    int nsteps = LUT.size();
+    int nsteps = qvector.size();
 
     ////////////////////////////// BEGIN SLAVE MODE //////////////////////////////
     hr = denso.bCapSlvChangeMode("514");
@@ -88,14 +108,14 @@ int main() {
     struct timespec tic, toc;
 
     s = 0.0;
-    q = LUT[0];
+    q = qvector[0];
     vntPose = denso.VNTFromRadVector(q);
     clock_gettime(CLOCK_MONOTONIC, &tic); //TIC
     hr = bCap_RobotExecute2(denso.iSockFD, denso.lhRobot, "slvMove", &vntPose, &vntReturn);
     history.push_back(vntReturn);
 
     for (int i = 0; i < nsteps; i++) {
-        q = LUT[i];
+        q = qvector[i];
         vntPose = denso.VNTFromRadVector(q);
         clock_gettime(CLOCK_MONOTONIC, &toc); //TOC
         s += (toc.tv_sec - tic.tv_sec) + (toc.tv_nsec - tic.tv_nsec)/nSEC_PER_SECOND;
