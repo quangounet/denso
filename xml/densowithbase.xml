@@ -1,0 +1,40 @@
+<Robot name="DensoWithBase">
+  
+  <Kinbody file="base.xml"></Kinbody>
+
+  <Robot file="denso-vs060.zae"></Robot>
+
+  <Kinbody>
+    <body name = "tray">
+      <offsetfrom>link6</offsetfrom><Geom type="box">
+	<Extents>0.11 0.11 0.008</Extents>
+	<diffusecolor>0.263 0.184 0.129</diffusecolor>
+	<Translation>0 0 -0.008</Translation>
+      </Geom>
+      <Translation>0 0 0.016</Translation>
+      <mass type="mimicgeom">
+	<total>0.2</total>
+      </mass>      
+    </body>
+    
+    <adjacent>tray link6</adjacent>
+ 
+    <joint name="dummy1" type="hinge" enable="false">
+      <body>link6</body>
+      <body>tray</body>
+      <limits>0 0</limits>
+    </joint>
+  </Kinbody>
+  
+  <!-- attach the robot with the base -->
+  <Kinbody>
+    <body name="topplate"></body>
+    <adjacent>link0 topplate</adjacent>
+    <joint name="dummy1" type="hinge" enable="false">
+      <body>link0</body>
+      <body>topplate</body>
+      <limits>0 0</limits>
+    </joint>
+  </Kinbody>
+
+</Robot>

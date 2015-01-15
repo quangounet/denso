@@ -1,0 +1,75 @@
+<Environment>
+  
+  <Robot file="densowithbase.xml"></Robot>
+ 
+  <Kinbody name="bottle">
+    <body>
+      <Geom type="box">
+	<extents>0.05 0.05 0.12</extents>
+	<diffusecolor>1.000 0.757 0.145</diffusecolor>
+	<Translation>0.05 0.05 0.12</Translation>
+      </Geom>
+    </body>
+  </Kinbody>
+  
+  <Kinbody name="floor">
+    <Body type="static">
+      <Geom type="box">
+	<extents>2 2 0.05</extents>
+	<diffusecolor>0.600 0.843 0.008</diffusecolor>
+	<Translation>0 0 -0.05</Translation>
+      </Geom>
+    </Body>
+  </Kinbody>
+
+  <Kinbody name="box1">
+    <!-- side wall -->
+    <Body type="static">
+      <Geom type="box">
+	<extents>0.05 0.3 0.695</extents>
+	<diffusecolor>1.00 0.2745 0.1608</diffusecolor>
+      </Geom>
+    </Body>
+    <Translation>0 0.38 0.695</Translation>
+  </Kinbody>
+
+  <Kinbody name="box2">
+    <!-- upper edge of the opening -->
+    <Body type="static">
+      <Geom type="box">
+	<extents>0.05 0.715 0.2</extents>
+	<diffusecolor>1.00 0.2745 0.1608</diffusecolor>
+      </Geom>
+    </Body>
+  </Kinbody>
+
+  <Kinbody name="box3">
+    <!-- lower edge of the opening -->
+    <Body type="static">
+      <Geom type="box">
+	<extents>0.05 0.414 0.455</extents>
+	<diffusecolor>1.00 0.2745 0.1608</diffusecolor>
+      </Geom>
+    </Body>
+  </Kinbody>
+
+  <Kinbody name="box4">
+    <Body type="static">
+      <Geom type="box">
+	<extents>0.05 0.329 0.15</extents>
+	<diffusecolor>1.00 0.2745 0.1608</diffusecolor>
+      </Geom>
+    </Body>
+  </Kinbody>
+
+  <Kinbody name="box5">
+    <!-- side edge of the opening -->
+    <Body type="static">
+      <Geom type="box">
+	<extents>0.05 0.124 0.8</extents>
+	<diffusecolor>1.00 0.2745 0.1608</diffusecolor>
+      </Geom>
+    </Body>
+  </Kinbody>
+  
+</Environment>
