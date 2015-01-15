@@ -4,12 +4,18 @@
 #include <cassert>
 #include <boost/typeof/std/vector.hpp>
 #include "../../TOPP/src/TOPP.h"
+#include "../../TOPP/src/Trajectory.cpp"
+#include "../../TOPP/src/TOPP.cpp"
 
 #define DEFAULT_SERVER_IP_ADDRESS    "192.168.0.1"
 #define DEFAULT_SERVER_PORT_NUM      5007
 
 #define E_BUF_FULL           0x83201483
 #define S_BUF_FULL           0x0F200501
+
+#define PI 3.1415926535897932
+#define nSEC_PER_SECOND 1E9
+#define dReal float
 
 namespace DensoController {
 
@@ -37,6 +43,7 @@ class DensoController {
 public:
     DensoController(const char* server_ip_address0 = DEFAULT_SERVER_IP_ADDRESS, int server_port_num0 = DEFAULT_SERVER_PORT_NUM);
 
+    // low level commands
     void bCapOpen();
     void bCapClose();
     void bCapServiceStart();
@@ -50,11 +57,15 @@ public:
     BCAP_HRESULT bCapMotor(bool command);
     BCAP_HRESULT bCapSlvChangeMode(const char* mode);
     BCAP_HRESULT bCapSlvMove(BCAP_VARIANT* pose, BCAP_VARIANT* result);
-    void bCapEnterProcess();
-    void bCapExitProcess();
-
     BCAP_HRESULT SetExtSpeed(const char* speed);
 
+    // high level commands
+    void bCapEnterProcess();
+    void bCapExitProcess();
+    void bCapSlvFollowTraj(TOPP::Trajectory& traj, std::vector<BCAP_VARIANT>& encoderlog, int sleeptime = 5);
+
+    // utilities
+    const char* CommandFromVector(std::vector<double> q);
     std::vector<double> GetCurJnt();
     std::vector<double> VectorFromVNT(BCAP_VARIANT vnt0);
     std::vector<double> RadVectorFromVNT(BCAP_VARIANT vnt0);

@@ -3,9 +3,6 @@
 #include <math.h>
 #include <time.h>
 
-
-#define PI 3.1415926535897932
-
 namespace DensoController {
 
 DensoController::DensoController(const char* server_ip_address0, int server_port_num0) {
@@ -13,35 +10,37 @@ DensoController::DensoController(const char* server_ip_address0, int server_port
     server_port_num = server_port_num0;
 }
 
+////////////////////////////// Low Level Commands //////////////////////////////
+
 void DensoController::bCapOpen() {
-    std::cout << "Initialize and start b-CAP.\n";
+    std::cout << "\033[1;32mInitialize and start b-CAP.\033[0m\n";
     BCAP_HRESULT hr = bCap_Open(server_ip_address, server_port_num, &iSockFD);
     if FAILED(hr) {
-        throw bCapException("bCap_Open failed.\n");
+        throw bCapException("\033[1;31bCap_Open failed.\033[0m\n");
     }
 }
 
 void DensoController::bCapClose() {
-    std::cout << "Stop b-CAP.\n";
+    std::cout << "\033[1;32mStop b-CAP.\033[0m\n";
     BCAP_HRESULT hr = bCap_Close(iSockFD);
     if FAILED(hr) {
-        throw bCapException("bCap_Close failed.\n");
+        throw bCapException("\033[1;31bCap_Close failed.\033[0m\n");
     }
 }
 
 void DensoController::bCapServiceStart() {
-    std::cout << "Start b-CAP service.\n";
+    std::cout << "\033[1;32mStart b-CAP service.\033[0m\n";
     BCAP_HRESULT hr = bCap_ServiceStart(iSockFD);
     if FAILED(hr) {
-        throw bCapException("bCap_ServiceStart failed.\n");
+        throw bCapException("\033[1;31bCap_ServiceStart failed.\033[0m\n");
     }
 }
 
 void DensoController::bCapServiceStop() {
-    std::cout << "Stop b-CAP service.\n";
+    std::cout << "\033[1;32mStop b-CAP service.\033[0m\n";
     BCAP_HRESULT hr = bCap_ServiceStop(iSockFD);
     if FAILED(hr) {
-        throw bCapException("bCap_ServiceStop failed.\n");
+        throw bCapException("\033[1;31mbCap_ServiceStop failed.\033[0m\n");
     }
 }
 
@@ -91,11 +90,11 @@ BCAP_HRESULT DensoController::bCapRobotMove(const char* pose, const char* option
 BCAP_HRESULT DensoController::bCapMotor(bool command) {
     BCAP_HRESULT hr;
     if (command) {
-        std::cout << "Turn motor on.\n";
+        std::cout << "\033[1;33mTurn motor on.\033[0m\n";
         hr = bCapRobotExecute("Motor", "1");
     }
     else{
-        std::cout << "Turn motor off.\n";
+        std::cout << "\033[1;33mTurn motor off.\033[0m\n";
         hr = bCapRobotExecute("Motor", "0");
     }
     return hr;
@@ -131,6 +130,59 @@ BCAP_HRESULT DensoController::bCapSlvChangeMode(const char* mode) {
     return hr;
 }
 
+BCAP_HRESULT DensoController::SetExtSpeed(const char* speed) {
+    BCAP_HRESULT hr;
+    hr = bCapRobotExecute("ExtSpeed", speed);
+    if SUCCEEDED(hr) {
+        std::cout << "External speed is set to " << speed << " %\n";
+    }
+    return hr;
+}
+
+////////////////////////////// High Level Commands //////////////////////////////
+
+void DensoController::bCapSlvFollowTraj(TOPP::Trajectory& traj, std::vector<BCAP_VARIANT>& encoderlog, int sleeptime){
+    // move to initial pose first
+    std::vector<double> q(traj.dimension);
+    traj.Eval(0, q);
+    const char* command = CommandFromVector(q);
+
+    BCAP_HRESULT hr;
+    hr = SetExtSpeed("100");
+    std::cout << "Moving to the initial pose...\n";
+    bCapRobotMove(command, "Speed = 25");
+    sleep(sleeptime);
+
+    // enable control logging
+    hr = bCapRobotExecute("ClearLog", ""); // enable control logging
+
+    // enter slave mode: mode 1 J-Type
+    hr = bCapSlvChangeMode("258");
+
+    double s = 0.0;
+    BCAP_VARIANT vntPose, vntReturn;
+    struct timespec tic, toc;
+    encoderlog.resize(0);
+
+    while (s < traj.duration) {
+        clock_gettime(CLOCK_MONOTONIC, &tic);
+        traj.Eval(s, q);
+        vntPose = VNTFromRadVector(q);
+        hr = bCap_RobotExecute2(iSockFD, lhRobot, "slvMove", &vntPose, &vntReturn);
+        // collect encoder log
+        encoderlog.push_back(vntReturn);
+        clock_gettime(CLOCK_MONOTONIC, &toc);
+        // set time increment based on actual used time
+        s += (toc.tv_sec - tic.tv_sec) + (toc.tv_nsec - tic.tv_nsec)/nSEC_PER_SECOND;
+    }
+
+    // exit slave mode
+    hr = bCapSlvChangeMode("0");
+
+    // stop control logging
+    hr = bCapRobotExecute("StopLog", "");
+}
+
 void DensoController::bCapEnterProcess(){
     BCAP_HRESULT hr;
 
@@ -141,13 +193,13 @@ void DensoController::bCapEnterProcess(){
 
     hr = bCapRobotExecute("Takearm", "");
     if FAILED(hr) {
-        throw bCapException("Fail to get arm control authority.\n");
+        throw bCapException("\033[1;31mFail to get arm control authority.\033[0m\n");
     }
 
     hr = bCapMotor(true);
     if FAILED(hr) {
         bCapExitProcess();
-        throw bCapException("Fail to turn motor on.\n");
+        throw bCapException("\033[1;31mFail to turn motor on.\033[0m\n");
     }
 
 }
@@ -156,12 +208,12 @@ void DensoController::bCapExitProcess() {
     BCAP_HRESULT hr;
     hr = bCapMotor(false);
     if FAILED(hr) {
-        std::cout << "Fail to turn off motor.\n";
+        std::cout << "\033[1;31mFail to turn off motor.\033[0m\n";
     }
 
     hr = bCapRobotExecute("Givearm", "");
     if FAILED(hr) {
-        std::cout << "Fail to release arm control authority.\n";
+        std::cout << "\033[1;31mFail to release arm control authority.\033[0m\n";
     }
 
     bCapReleaseRobot();
@@ -170,13 +222,16 @@ void DensoController::bCapExitProcess() {
     bCapClose();
 }
 
-BCAP_HRESULT DensoController::SetExtSpeed(const char* speed) {
-    BCAP_HRESULT hr;
-    hr = bCapRobotExecute("ExtSpeed", speed);
-    if SUCCEEDED(hr) {
-        std::cout << "External speed is set to " << speed << " %\n";
-    }
-    return hr;
+////////////////////////////// Utilities //////////////////////////////
+
+const char* DensoController::CommandFromVector(std::vector<double> q) {
+    std::vector<double> tmp;
+    tmp = VRad2Deg(q);
+    std::string commandstring;
+    commandstring = "J(" + std::to_string(tmp[0]) + ", " + std::to_string(tmp[1])
+                    + ", " + std::to_string(tmp[2]) + ", " + std::to_string(tmp[3])
+                    + ", " + std::to_string(tmp[4]) + ", " + std::to_string(tmp[5]) + ")";
+    return commandstring.c_str(); // convert string -> const shar*
 }
 
 std::vector<double> DensoController::GetCurJnt() {
@@ -187,7 +242,7 @@ std::vector<double> DensoController::GetCurJnt() {
 
     hr = bCap_RobotExecute(iSockFD, lhRobot, "CurJnt", "", &dJnt);
     if FAILED(hr) {
-        std::cout << "Fail to get current joint values.\n";
+        std::cout << "\033[1;31mFail to get current joint values.\033[0m\n";
         return jointvalues;
     }
     for (int i = 0; i < 8; i++) {

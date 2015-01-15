@@ -105,6 +105,67 @@ def VRad2Deg(vect0):
 
 ############################## PLOTTING ##############################
 
+def PlotRefVSData(traj, q_history, timestamp, dt = 1e-3, dof = -1):
+    ndof = traj.dimension
+    T = np.arange(0, traj.duration, dt)
+    q = [traj.Eval(t) for t in T]
+
+    colorcycle = ['k', '#e83425', '#ffb225', '#390874', '#38b48b', '#2572ff', '#333333']
+    plt.figure()
+    plt.hold('on')
+    ax = plt.gca()
+    ax.set_color_cycle(colorcycle)
+    
+    if (dof == -1):
+        plt.plot(T, np.rad2deg(q), linewidth = 2)
+        plt.plot(timestamp, q_history.T, 'x--', linewidth = 2, markersize = 5)
+    else:
+        plt.plot(T, np.transpose(np.rad2deg(q))[dof], linewidth = 2)
+        plt.plot(timestamp, q_history[dof], 'x--', linewidth = 2, markersize = 5)
+        
+    plt.show(False)
+
+def PlotdRefVSData(traj, qd_history, timestamp, dt = 1e-3, dof = -1):
+    ndof = traj.dimension
+    T = np.arange(0, traj.duration, dt)
+    qd = [traj.Evald(t) for t in T]
+
+    colorcycle = ['k', '#e83425', '#ffb225', '#390874', '#38b48b', '#2572ff', '#333333']
+    plt.figure()
+    plt.hold('on')
+    ax = plt.gca()
+    ax.set_color_cycle(colorcycle)
+    
+    if (dof == -1):
+        plt.plot(T, np.rad2deg(qd), linewidth = 2)
+        plt.plot(timestamp, qd_history.T, 'x--', linewidth = 2, markersize = 5)
+    else:
+        plt.plot(T, np.transpose(np.rad2deg(qd))[dof], linewidth = 2)
+        plt.plot(timestamp, qd_history[dof], 'x--', linewidth = 2, markersize = 5)
+        
+    plt.show(False)
+
+def PlotddRefVSData(traj, qdd_history, timestamp, dt = 1e-3, dof = -1):
+    ndof = traj.dimension
+    T = np.arange(0, traj.duration, dt)
+    qdd = [traj.Evaldd(t) for t in T]
+
+    colorcycle = ['k', '#e83425', '#ffb225', '#390874', '#38b48b', '#2572ff', '#333333']
+    plt.figure()
+    plt.hold('on')
+    ax = plt.gca()
+    ax.set_color_cycle(colorcycle)
+    
+    if (dof == -1):
+        plt.plot(T, np.rad2deg(qdd), linewidth = 2)
+        plt.plot(timestamp, qdd_history.T, 'x--', linewidth = 2, markersize = 5)
+    else:
+        plt.plot(T, np.transpose(np.rad2deg(qdd))[dof], linewidth = 2)
+        plt.plot(timestamp, qdd_history[dof], 'x--', linewidth = 2, markersize = 5)
+        
+    plt.show(False)
+  
+
 def PlotDOF(robot, traj, dt, dof = -1):
     ndof = traj.dimension
     lowerdof_lim = robot.GetDOFLimits()[0]
