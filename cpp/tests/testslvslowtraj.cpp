@@ -37,9 +37,9 @@ int main() {
     tmp = DensoController::VRad2Deg(q);
     std::string commandstring;
     const char* command;
-    commandstring = "J(" + std::to_string(tmp[0]) + ", " + std::to_string(tmp[1])
-                    + ", " + std::to_string(tmp[2]) + ", " + std::to_string(tmp[3])
-                    + ", " + std::to_string(tmp[4]) + ", " + std::to_string(tmp[5]) + ")";
+    commandstring = "J(" + std::to_string(tmp[0]) + ',' + std::to_string(tmp[1])
+                    + ',' + std::to_string(tmp[2]) + ',' + std::to_string(tmp[3])
+                    + ',' + std::to_string(tmp[4]) + ',' + std::to_string(tmp[5]) + ')';
     command = commandstring.c_str(); // convert string -> const shar*
     std::cout << commandstring << "\n";
     denso.bCapRobotMove(command, "Speed = 25");
@@ -68,7 +68,9 @@ int main() {
         // data collecting
         history.push_back(vntReturn);
         clock_gettime(CLOCK_MONOTONIC, &toc);
-        s += (toc.tv_sec - tic.tv_sec) + (toc.tv_nsec - tic.tv_nsec)/nSEC_PER_SECOND;
+        // 0.5X speed
+        s += 0.5 * ((toc.tv_sec - tic.tv_sec) + (toc.tv_nsec - tic.tv_nsec)/nSEC_PER_SECOND);
+        // std::cout << s << " ";
     }
 
     ////////////////////////////// STOP SLAVE MODE //////////////////////////////
@@ -88,12 +90,12 @@ int main() {
         }
         ss << "\n";
     }
-    std::ofstream out1("densohistory.traj");
+    std::ofstream out1("densohistory.slowtraj");
     out1 << ss.str();
     out1.close();
     std::cout << "waypoints successfully written in denhistory.traj\n";
 
-    std::ofstream out2("densohistory.timestamp");
+    std::ofstream out2("densohistory.slowtimestamp");
     out2 << t.str();
     out2.close();
     std::cout << "timestamp successfully written in denhistory.timestamp\n";
