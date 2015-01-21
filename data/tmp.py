@@ -1,5 +1,10 @@
 traj = traj000
 
+from scipy import interpolate
+import numpy as np
+from numpy import *
+import matplotlib.pyplot as plt
+
 nsamples = 50
 
 t = linspace(0, traj.duration, nsamples)
@@ -7,9 +12,9 @@ t = linspace(0, traj.duration, nsamples)
 dt = 0.008
 
 tnew0 = [i for i in np.arange(0, 1.5, dt*0.7)]
-tnew1 = [i for i in np.arange(1.5, 3, dt)]
-tnew2 = [i for i in np.arange(3, 3.45, dt)]
-tnew3 = [i for i in np.arange(3.45, traj.duration + dt, dt)]
+tnew1 = [i for i in np.arange(1.5, 3.25, dt*1.1)]
+tnew2 = [i for i in np.arange(3.25, 3.75, dt*1.35*1.1)]
+tnew3 = [i for i in np.arange(3.75, traj.duration + dt, dt)]
 tnew = []
 for j in tnew0:
     tnew.append(j)
@@ -20,11 +25,6 @@ for j in tnew2:
 for j in tnew3:
     tnew.append(j)
 tnew = np.asarray(tnew)
-
-tnew = np.arange(0, traj.duration + dt, dt)
-
-
-
 
 q0 = np.array([traj.Eval(i)[0] for i in t])
 q1 = np.array([traj.Eval(i)[1] for i in t])
@@ -46,6 +46,9 @@ qdd2 = np.array([traj.Evaldd(i)[2] for i in t])
 qdd3 = np.array([traj.Evaldd(i)[3] for i in t])
 qdd4 = np.array([traj.Evaldd(i)[4] for i in t])
 qdd5 = np.array([traj.Evaldd(i)[5] for i in t])
+
+
+
 
 degree = 5
 smooth = .0008
@@ -127,15 +130,15 @@ qdd5new = scipy.interpolate.splev(tnew, tck5, der = 1)
 
 q0new = integ(tnew, tck0)
 q0new = q0new - (q0new[0] - q0[0])
-q1new = integ(tnew, tck1) - (q1new[0] - q1[0])
+q1new = integ(tnew, tck1)
 q1new = q1new - (q1new[0] - q1[0])
-q2new = integ(tnew, tck2) - (q2new[0] - q2[0])
+q2new = integ(tnew, tck2)
 q2new = q2new - (q2new[0] - q2[0])
-q3new = integ(tnew, tck3) - (q3new[0] - q3[0])
+q3new = integ(tnew, tck3)
 q3new = q3new - (q3new[0] - q3[0])
-q4new = integ(tnew, tck4) - (q4new[0] - q4[0])
+q4new = integ(tnew, tck4)
 q4new = q4new - (q4new[0] - q4[0])
-q5new = integ(tnew, tck5) - (q5new[0] - q5[0])
+q5new = integ(tnew, tck5)
 q5new = q5new - (q5new[0] - q5[0])
 
 
@@ -187,3 +190,9 @@ for i in range(len(q0new)):
     ss += separator
     ss += "{0} {1} {2} {3} {4} {5}".format(q0newdeg[i], q1newdeg[i], q2newdeg[i], q3newdeg[i], q4newdeg[i], q5newdeg[i])
     separator = "\n"
+
+
+
+
+with open('../data/table4.traj', 'w') as f:
+    f.write(ss)
