@@ -3,9 +3,9 @@
 #include <string>
 #include <cassert>
 #include <boost/typeof/std/vector.hpp>
-#include "../../TOPP/src/TOPP.h"
-#include "../../TOPP/src/Trajectory.cpp"
-#include "../../TOPP/src/TOPP.cpp"
+#include "../../../TOPP/src/TOPP.h"
+#include "../../../TOPP/src/Trajectory.cpp"
+#include "../../../TOPP/src/TOPP.cpp"
 
 #define DEFAULT_SERVER_IP_ADDRESS    "192.168.0.1"
 #define DEFAULT_SERVER_PORT_NUM      5007
