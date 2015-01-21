@@ -149,7 +149,7 @@ void DensoController::bCapSlvFollowTraj(TOPP::Trajectory& traj, std::vector<BCAP
 
     BCAP_HRESULT hr;
     hr = SetExtSpeed("100");
-    std::cout << "Moving to the initial pose...\n";
+    std::cout << "\n\033[1;33mMoving to the initial pose...\033[0m\n\n";
     bCapRobotMove(command, "Speed = 25");
     sleep(sleeptime);
 
