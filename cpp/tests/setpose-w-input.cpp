@@ -20,13 +20,13 @@ int main() {
 
     std::vector<double> tmp;
     std::vector<double> qdeg;
-    qdeg.resize(0);
+    tmp.resize(0);
     double jval;
     std::cout << "Please enter the values for each joint\n";
     for (int j = 1; j <=6; j++) {
         std::cout << "joint " << std::to_string(j) << ": ";
         std::cin >> jval;
-        qdeg.push_back(jval);
+        tmp.push_back(jval);
     }
     if (option == 1) {
         qdeg = DensoController::VRad2Deg(tmp);

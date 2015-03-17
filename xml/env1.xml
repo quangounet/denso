@@ -2,12 +2,28 @@
   
   <Robot file="densowithbase.xml"></Robot>
  
+  <!-- <Kinbody name="bottle"> -->
+  <!--   <body> -->
+  <!--     <Geom type="box"> -->
+  <!-- 	<extents>0.05 0.05 0.12</extents> -->
+  <!-- 	<diffusecolor>1.000 0.757 0.145</diffusecolor> -->
+  	<!-- <Translation>0.05 0.05 0.12</Translation> -->
+  <!-- 	<Translation>0 0 0.136</Translation> -->
+  <!--     </Geom> -->
+  <!--   </body> -->
+  <!-- </Kinbody> -->
+
   <Kinbody name="bottle">
     <body>
       <Geom type="box">
 	<extents>0.05 0.05 0.12</extents>
 	<diffusecolor>1.000 0.757 0.145</diffusecolor>
-	<Translation>0.05 0.05 0.12</Translation>
+	<Translation>0 0 0.12</Translation>
+      </Geom>
+      <Geom type="box">
+    	<extents>0.1 0.1 0.01</extents>
+    	<diffusecolor>1.000 0.757 0.145</diffusecolor>
+    	<Translation>0 0 0.01</Translation>
       </Geom>
     </body>
   </Kinbody>
